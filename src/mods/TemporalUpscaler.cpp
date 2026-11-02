@@ -108,11 +108,17 @@ void TemporalUpscaler::on_draw_ui() {
         return;
     }
 
-#if TDB_VER < 67
+#if TDB_VER < 66
     ImGui::TextWrapped("TemporalUpscaler is not yet supported on this version of the engine.");
     ImGui::TextWrapped("Supported: RE2/RE3/RE7 (RT latest, not beta builds), RE4, RE8, SF6, DMC5 (partial)");
     return;
 #else
+    if (!m_is_d3d12) {
+        ImGui::TextWrapped("TemporalUpscaler requires DirectX 12.");
+        ImGui::TextWrapped("Please switch Graphics API to DirectX 12 in the game settings.");
+        return;
+    }
+
     if (!m_backend_loaded) {
         ImGui::TextWrapped("Backend is not loaded, TemporalUpscaler will not work.");
         ImGui::TextWrapped("Make sure you've downloaded UpscalerBasePlugin (PDPerfPlugin.dll)");
@@ -1352,7 +1358,7 @@ void TemporalUpscaler::finish_release_resources() {
 }
 
 void TemporalUpscaler::update_motion_scale() {
-#if TDB_VER > 67
+#if TDB_VER > 67 || defined(RE2)
     m_motion_scale[0] = (float)get_render_width() / 2.0f;
     m_motion_scale[1] = -1.0f * ((float)get_render_height() / 2.0f);
 #else
